@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Админка — SakuraClient</title>
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path fill="#ff5c9e" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#ff6fae" transform="rotate(72 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#e33c86" transform="rotate(144 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#ff8fbf" transform="rotate(216 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#c86bdd" transform="rotate(288 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <circle cx="32" cy="32" r="5" fill="#fff" />
+        </svg>
+        <span>SAKURA</span>
+        <em>26.2</em>
+      </a>
+
+      <div class="header-actions">
+        <a class="btn btn-ghost btn-sm" href="/app.html">Кабинет</a>
+        <span class="muted" id="headerUser"></span>
+        <button class="btn btn-ghost btn-sm" id="logoutButton" type="button">Выйти</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dash">
+    <div class="container">
+      <div class="dash-header">
+        <h1>Админ-панель</h1>
+        <button class="btn btn-ghost btn-sm" id="refreshButton" type="button">Обновить</button>
+      </div>
+
+      <section class="panel" id="deniedPanel" hidden>
+        <h2>Нет доступа</h2>
+        <p class="muted" id="deniedText">Нужны права владельца.</p>
+      </section>
+
+      <div id="adminArea" hidden>
+        <div class="admin-tabs">
+          <button type="button" data-tab="users" class="is-active">Пользователи</button>
+          <button type="button" data-tab="keys">Ключи</button>
+          <button type="button" data-tab="discounts">Скидки</button>
+          <button type="button" data-tab="orders">Заказы</button>
+        </div>
+
+        <section class="panel" data-panel="users">
+          <h2>Пользователи</h2>
+          <div class="form-message" id="usersMessage"></div>
+          <div class="table-scroll">
+            <table class="orders">
+              <thead>
+                <tr>
+                  <th>Логин</th>
+                  <th>UID</th>
+                  <th>Роль</th>
+                  <th>Подписка</th>
+                  <th>HWID</th>
+                  <th>Регистрация</th>
+                </tr>
+              </thead>
+              <tbody id="usersBody">
+                <tr><td colspan="6" class="muted">Загрузка…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="keys" hidden>
+          <h2>Ключи доступа</h2>
+          <form class="inline-form" id="keyForm">
+            <select id="keyProduct" aria-label="Товар"></select>
+            <input id="keyCount" type="number" min="1" max="50" value="5" aria-label="Сколько ключей" />
+            <input id="keyNote" type="text" maxlength="60" placeholder="пометка" aria-label="Пометка" />
+            <button class="btn" type="submit">Создать</button>
+          </form>
+          <div class="form-message" id="keysMessage"></div>
+          <div class="table-scroll">
+            <table class="orders">
+              <thead>
+                <tr>
+                  <th>Ключ</th>
+                  <th>Товар</th>
+                  <th>Статус</th>
+                  <th>Пометка</th>
+                  <th>Создан</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="keysBody">
+                <tr><td colspan="6" class="muted">Загрузка…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="discounts" hidden>
+          <h2>Скидки</h2>
+          <form class="inline-form" id="discountForm">
+            <input id="discountCode" type="text" maxlength="20" placeholder="SAKURA10" aria-label="Код" />
+            <input id="discountPercent" type="number" min="5" max="90" value="10" aria-label="Процент" />
+            <input id="discountUses" type="number" min="1" value="100" aria-label="Лимон использований" />
+            <button class="btn" type="submit">Создать</button>
+          </form>
+          <div class="form-message" id="discountsMessage"></div>
+          <div class="table-scroll">
+            <table class="orders">
+              <thead>
+                <tr>
+                  <th>Код</th>
+                  <th>Скидка</th>
+                  <th>Использовано</th>
+                  <th>Статус</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="discountsBody">
+                <tr><td colspan="5" class="muted">Загрузка…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel" data-panel="orders" hidden>
+          <h2>Заказы</h2>
+          <div class="form-message" id="ordersMessage"></div>
+          <div class="table-scroll">
+            <table class="orders">
+              <thead>
+                <tr>
+                  <th>№</th>
+                  <th>Пользователь</th>
+                  <th>Товар</th>
+                  <th>Сумма</th>
+                  <th>Скидка</th>
+                  <th>Дата</th>
+                </tr>
+              </thead>
+              <tbody id="ordersBody">
+                <tr><td colspan="6" class="muted">Загрузка…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="/assets/api.js"></script>
+  <script>
+    (function () {
+      const ROLES = ["Player", "User", "Developer"];
+      const state = { me: null, products: [] };
+
+      const el = (id) => document.getElementById(id);
+      const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (ch) => (
+        { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]
+      ));
+
+      function message(id, text, ok) {
+        const node = el(id);
+        node.textContent = text || "";
+        node.style.color = ok ? "var(--ok)" : "var(--danger)";
+      }
+
+      function deny(text) {
+        el("adminArea").hidden = true;
+        el("deniedPanel").hidden = false;
+        el("deniedText").textContent = text;
+      }
+
+      document.querySelectorAll(".admin-tabs button").forEach(function (button) {
+        button.addEventListener("click", function () {
+          document.querySelectorAll(".admin-tabs button").forEach((b) => b.classList.remove("is-active"));
+          button.classList.add("is-active");
+          document.querySelectorAll("[data-panel]").forEach((panel) => {
+            panel.hidden = panel.dataset.panel !== button.dataset.tab;
+          });
+        });
+      });
+
+      function subscriptionText(user) {
+        if (user.lifetime) return "Навсегда";
+        if (user.activeSubscription) return user.daysLeft + " дн.";
+        return "нет";
+      }
+
+      function renderUsers(users) {
+        el("usersBody").innerHTML = users.map(function (user) {
+          const isSelf = user.id === state.me.id;
+          const isOwner = user.role === "Owner";
+
+          const role = isOwner
+            ? '<span class="role-badge">Owner</span>'
+            : isSelf
+              ? '<span class="muted">' + esc(user.role) + " (ты)</span>"
+              : '<select data-role="' + user.id + '">' +
+                ROLES.map((role) =>
+                  '<option value="' + role + '"' + (role === user.role ? " selected" : "") + ">" + role + "</option>"
+                ).join("") +
+                "</select>";
+
+          const hwid = user.hasHwid
+            ? '<button class="link-btn" data-hwid="' + user.id + '">сбросить</button>'
+            : '<span class="muted">не привязан</span>';
+
+          return "<tr>" +
+            "<td>" + esc(user.username) + "</td>" +
+            '<td class="mono">' + esc(user.uid) + "</td>" +
+            "<td>" + role + "</td>" +
+            "<td>" + esc(subscriptionText(user)) + "</td>" +
+            "<td>" + hwid + "</td>" +
+            "<td>" + Sakura.date(user.createdAtUtc) + "</td>" +
+            "</tr>";
+        }).join("");
+      }
+
+      function renderKeys(keys) {
+        el("keysBody").innerHTML = keys.length
+          ? keys.map(function (key) {
+            const action = key.used
+              ? '<span class="muted">—</span>'
+              : '<button class="link-btn" data-revoke="' + key.id + '">удалить</button>';
+
+            return "<tr>" +
+              '<td class="mono key-value">' + esc(key.value) + "</td>" +
+              "<td>" + esc(key.productName) + "</td>" +
+              "<td>" + esc(key.statusText) + "</td>" +
+              "<td>" + esc(key.note || "—") + "</td>" +
+              "<td>" + Sakura.date(key.createdAtUtc) + "</td>" +
+              "<td>" + action + "</td>" +
+              "</tr>";
+          }).join("")
+          : '<tr><td colspan="6" class="muted">Ключей пока нет</td></tr>';
+      }
+
+      function renderDiscounts(discounts) {
+        el("discountsBody").innerHTML = discounts.length
+          ? discounts.map(function (discount) {
+            return "<tr>" +
+              '<td class="mono">' + esc(discount.code) + "</td>" +
+              "<td>" + discount.percent + "%</td>" +
+              "<td>" + discount.uses + " / " + discount.maxUses + "</td>" +
+              '<td><span class="status-pill ' + (discount.isActive ? "is-ok" : "is-off") + '">' +
+              (discount.isActive ? "Активна" : "Выключена") + "</span></td>" +
+              '<td><button class="link-btn" data-toggle="' + discount.id + '">' +
+              (discount.isActive ? "выключить" : "включить") + "</button></td>" +
+              "</tr>";
+          }).join("")
+          : '<tr><td colspan="5" class="muted">Скидок пока нет</td></tr>';
+      }
+
+      function renderOrders(orders) {
+        el("ordersBody").innerHTML = orders.length
+          ? orders.map(function (order) {
+            return "<tr>" +
+              "<td>" + order.id + "</td>" +
+              "<td>" + esc(order.username) + "</td>" +
+              "<td>" + esc(order.productName) + "</td>" +
+              "<td>" + Sakura.money(order.amount) + "</td>" +
+              "<td>" + (order.discountPercent ? order.discountPercent + "% · " + esc(order.discountCode || "") : "—") + "</td>" +
+              "<td>" + Sakura.date(order.createdAtUtc) + "</td>" +
+              "</tr>";
+          }).join("")
+          : '<tr><td colspan="6" class="muted">Заказов пока нет</td></tr>';
+      }
+
+      async function load() {
+        const results = await Promise.all([
+          Sakura.api("/api/admin/users"),
+          Sakura.api("/api/admin/keys"),
+          Sakura.api("/api/admin/discounts"),
+          Sakura.api("/api/admin/orders"),
+          Sakura.api("/api/site/products")
+        ]);
+
+        renderUsers(results[0] || []);
+        renderKeys(results[1] || []);
+        renderDiscounts(results[2] || []);
+        renderOrders(results[3] || []);
+
+        state.products = results[4] || [];
+        el("keyProduct").innerHTML = state.products
+          .filter((product) => product.kind !== "hwid")
+          .map((product) => '<option value="' + product.id + '">' + esc(product.name) + "</option>")
+          .join("");
+      }
+
+      // Действия в таблицах вешаются на контейнер: строки перерисовываются после каждого запроса.
+      el("usersBody").addEventListener("change", async function (event) {
+        const select = event.target.closest("[data-role]");
+        if (!select) return;
+
+        try {
+          await Sakura.api("/api/admin/users/" + select.dataset.role + "/role", {
+            method: "POST",
+            body: JSON.stringify({ role: select.value })
+          });
+          message("usersMessage", "Роль обновлена", true);
+          await load();
+        } catch (error) {
+          message("usersMessage", error.message);
+          await load();
+        }
+      });
+
+      el("usersBody").addEventListener("click", async function (event) {
+        const button = event.target.closest("[data-hwid]");
+        if (!button) return;
+
+        try {
+          await Sakura.api("/api/admin/users/" + button.dataset.hwid + "/reset-hwid", { method: "POST" });
+          message("usersMessage", "HWID сброшен", true);
+          await load();
+        } catch (error) {
+          message("usersMessage", error.message);
+        }
+      });
+
+      el("keysBody").addEventListener("click", async function (event) {
+        const button = event.target.closest("[data-revoke]");
+        if (!button) return;
+
+        try {
+          await Sakura.api("/api/admin/keys/" + button.dataset.revoke + "/revoke", { method: "POST" });
+          message("keysMessage", "Ключ удалён", true);
+          await load();
+        } catch (error) {
+          message("keysMessage", error.message);
+        }
+      });
+
+      el("discountsBody").addEventListener("click", async function (event) {
+        const button = event.target.closest("[data-toggle]");
+        if (!button) return;
+
+        try {
+          await Sakura.api("/api/admin/discounts/" + button.dataset.toggle + "/toggle", { method: "POST" });
+          message("discountsMessage", "Скидка обновлена", true);
+          await load();
+        } catch (error) {
+          message("discountsMessage", error.message);
+        }
+      });
+
+      el("keyForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const productId = Number(el("keyProduct").value);
+        const count = Number(el("keyCount").value);
+
+        if (!productId || !count) {
+          message("keysMessage", "Выбери товар и количество");
+          return;
+        }
+
+        try {
+          const created = await Sakura.api("/api/admin/keys", {
+            method: "POST",
+            body: JSON.stringify({
+              productId: productId,
+              count: count,
+              note: el("keyNote").value.trim()
+            })
+          });
+          message("keysMessage", "Создано ключей: " + created.length, true);
+          el("keyNote").value = "";
+          await load();
+        } catch (error) {
+          message("keysMessage", error.message);
+        }
+      });
+
+      el("discountForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        try {
+          await Sakura.api("/api/admin/discounts", {
+            method: "POST",
+            body: JSON.stringify({
+              code: el("discountCode").value.trim(),
+              percent: Number(el("discountPercent").value),
+              maxUses: Number(el("discountUses").value)
+            })
+          });
+          message("discountsMessage", "Скидка создана", true);
+          el("discountCode").value = "";
+          await load();
+        } catch (error) {
+          message("discountsMessage", error.message);
+        }
+      });
+
+      el("refreshButton").addEventListener("click", function () {
+        load().catch((error) => message("usersMessage", error.message));
+      });
+
+      el("logoutButton").addEventListener("click", Sakura.logout);
+
+      async function start() {
+        if (!Sakura.requireAuth()) return;
+
+        try {
+          state.me = await Sakura.api("/api/me");
+        } catch (error) {
+          if (error.status === 401) {
+            Sakura.store.clear();
+            location.href = "/login.html";
+            return;
+          }
+          deny(error.message);
+          return;
+        }
+
+        el("headerUser").textContent = state.me.username;
+
+        if (state.me.role !== "Owner") {
+          deny("Админка доступна только владельцу. Твоя роль: " + state.me.role + ".");
+          return;
+        }
+
+        el("deniedPanel").hidden = true;
+        el("adminArea").hidden = false;
+
+        try {
+          await load();
+        } catch (error) {
+          deny(error.message);
+        }
+      }
+
+      start();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Регистрация — SakuraClient</title>
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <main class="auth-page">
+    <div class="auth-card">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path fill="#ff5c9e" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#ff6fae" transform="rotate(72 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#e33c86" transform="rotate(144 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#ff8fbf" transform="rotate(216 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#c86bdd" transform="rotate(288 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <circle cx="32" cy="32" r="5" fill="#fff" />
+        </svg>
+        <span>SAKURA</span>
+      </a>
+
+      <h1>Создай аккаунт</h1>
+      <p class="sub">Регистрация в SakuraClient</p>
+
+      <form id="registerForm" autocomplete="on">
+        <div class="field">
+          <label for="username">Логин</label>
+          <input id="username" name="username" type="text" required minlength="3" maxlength="20" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label for="password">Пароль</label>
+          <input id="password" name="password" type="password" required minlength="6" autocomplete="new-password" />
+        </div>
+        <div class="field">
+          <label for="repeat">Повтори пароль</label>
+          <input id="repeat" name="repeat" type="password" required minlength="6" autocomplete="new-password" />
+        </div>
+        <button class="btn" type="submit" id="submitButton">Создать аккаунт</button>
+        <p class="form-message" id="message"></p>
+      </form>
+
+      <p class="auth-alt">Уже есть аккаунт? <a href="/login.html">Войти</a></p>
+    </div>
+  </main>
+
+  <script src="/assets/api.js"></script>
+  <script>
+    const form = document.getElementById("registerForm");
+    const message = document.getElementById("message");
+    const submit = document.getElementById("submitButton");
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      message.textContent = "";
+
+      if (form.password.value !== form.repeat.value) {
+        message.textContent = "Пароли не совпадают";
+        return;
+      }
+
+      submit.disabled = true;
+
+      try {
+        const auth = await Sakura.api("/api/site/register", {
+          method: "POST",
+          body: JSON.stringify({
+            username: form.username.value.trim(),
+            password: form.password.value
+          })
+        });
+        Sakura.store.save(auth);
+        location.href = "/app.html";
+      } catch (error) {
+        message.textContent = error.message;
+      } finally {
+        submit.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

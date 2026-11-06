@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Личный кабинет — SakuraClient</title>
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path fill="#ff5c9e" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#ff6fae" transform="rotate(72 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#e33c86" transform="rotate(144 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#ff8fbf" transform="rotate(216 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#c86bdd" transform="rotate(288 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <circle cx="32" cy="32" r="5" fill="#fff" />
+        </svg>
+        <span>SAKURA</span>
+        <em>26.2</em>
+      </a>
+
+      <div class="header-actions">
+        <a class="btn btn-ghost btn-sm" href="/admin.html" id="adminLink" hidden>Админка</a>
+        <span class="muted" id="headerUser"></span>
+        <button class="btn btn-ghost btn-sm" id="logoutButton" type="button">Выйти</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dash">
+    <div class="container">
+      <div class="dash-header">
+        <h1>Личный кабинет</h1>
+        <a class="btn btn-ghost btn-sm" href="/download/SakuraLoader.exe">Скачать лоадер</a>
+      </div>
+
+      <div class="dash-grid">
+        <div>
+          <section class="panel">
+            <h2>Профиль</h2>
+            <div class="profile-top">
+              <div class="avatar" id="avatar">?</div>
+              <div>
+                <h3 id="username">—</h3>
+                <p class="uid" id="uid">UID —</p>
+                <span class="role-badge" id="role">player</span>
+              </div>
+            </div>
+            <div class="stat-row">
+              <span>Дата регистрации</span>
+              <b id="createdAt">—</b>
+            </div>
+            <div class="stat-row">
+              <span>HWID</span>
+              <b id="hwidState">—</b>
+            </div>
+          </section>
+
+          <section class="panel">
+            <h2>Подписка</h2>
+            <div class="stat-row">
+              <span>Статус</span>
+              <b class="status-pill is-off" id="subStatus">Не активна</b>
+            </div>
+            <div class="stat-row">
+              <span>Действует до</span>
+              <b id="subEnds">—</b>
+            </div>
+            <div class="stat-row">
+              <span>Осталось дней</span>
+              <b id="subDays">0</b>
+            </div>
+            <div class="stat-row">
+              <span>Сброс HWID</span>
+              <a href="https://funpay.com/lots/offer?id=80995797" target="_blank" rel="noopener">Оформить</a>
+            </div>
+          </section>
+        </div>
+
+        <div>
+          <section class="panel">
+            <h2>Активация ключа</h2>
+            <form class="inline-form" id="keyForm">
+              <input id="keyInput" type="text" placeholder="SAKURA-XXXX-XXXX" autocomplete="off" />
+              <button class="btn" type="submit" id="keyButton">Активировать</button>
+            </form>
+            <p class="form-message" id="keyMessage"></p>
+          </section>
+
+          <section class="panel">
+            <h2>Магазин</h2>
+            <div class="shop-grid" id="shopGrid"></div>
+          </section>
+
+          <section class="panel">
+            <h2>Мои заказы</h2>
+            <table class="orders">
+              <thead>
+                <tr>
+                  <th>Товар</th>
+                  <th>Сумма</th>
+                  <th>Дата</th>
+                </tr>
+              </thead>
+              <tbody id="ordersBody">
+                <tr><td colspan="3" class="muted">Загрузка…</td></tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/assets/api.js"></script>
+  <script>
+    (async function () {
+      if (!Sakura.requireAuth()) return;
+
+      const state = { user: null };
+
+      document.getElementById("logoutButton").addEventListener("click", Sakura.logout);
+
+      function renderUser(user) {
+        state.user = user;
+        Sakura.store.update(user);
+
+        document.getElementById("headerUser").textContent = user.username;
+        document.getElementById("username").textContent = user.username;
+        document.getElementById("avatar").textContent = (user.username || "?").charAt(0).toUpperCase();
+        document.getElementById("uid").textContent = "UID " + (user.uid || "—");
+        document.getElementById("role").textContent = user.role;
+        document.getElementById("createdAt").textContent = Sakura.date(user.createdAtUtc);
+        document.getElementById("hwidState").textContent = user.hasHwid ? "Привязан" : "Не привязан";
+        document.getElementById("adminLink").hidden = user.role !== "Owner";
+
+        const active = user.activeSubscription;
+        const status = document.getElementById("subStatus");
+        status.textContent = active ? (user.lifetime ? "Навсегда" : "Активна") : "Не активна";
+        status.className = "status-pill " + (active ? "is-ok" : "is-off");
+        document.getElementById("subEnds").textContent = user.lifetime ? "Бессрочно" : Sakura.date(user.subscriptionEndsUtc);
+        document.getElementById("subDays").textContent = user.lifetime ? "∞" : user.daysLeft;
+      }
+
+      function renderShop(products) {
+        const grid = document.getElementById("shopGrid");
+        if (!products.length) {
+          grid.innerHTML = '<p class="muted">Товары временно недоступны</p>';
+          return;
+        }
+
+        grid.innerHTML = products.map(function (product) {
+          return (
+            '<article class="shop-item">' +
+            "<h3>" + product.name + "</h3>" +
+            '<span class="period">' + product.periodText + "</span>" +
+            '<span class="cost">' + Sakura.money(product.price) + "</span>" +
+            '<a class="btn btn-sm" href="' + Sakura.buyLink(product) + '" target="_blank" rel="noopener">Купить</a>' +
+            "</article>"
+          );
+        }).join("");
+      }
+
+      function renderOrders(orders) {
+        const body = document.getElementById("ordersBody");
+        if (!orders.length) {
+          body.innerHTML = '<tr><td colspan="3" class="muted">Заказов пока нет</td></tr>';
+          return;
+        }
+
+        body.innerHTML = orders.map(function (order) {
+          return (
+            "<tr>" +
+            "<td>" + order.productName + "</td>" +
+            "<td>" + Sakura.money(order.amount) + "</td>" +
+            "<td>" + Sakura.date(order.createdAtUtc) + "</td>" +
+            "</tr>"
+          );
+        }).join("");
+      }
+
+      document.getElementById("keyForm").addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const input = document.getElementById("keyInput");
+        const button = document.getElementById("keyButton");
+        const message = document.getElementById("keyMessage");
+        const key = input.value.trim();
+
+        if (!key) return;
+
+        message.textContent = "";
+        button.disabled = true;
+
+        try {
+          const result = await Sakura.api("/api/keys/activate", {
+            method: "POST",
+            body: JSON.stringify({ key: key })
+          });
+          renderUser(result.user);
+          input.value = "";
+          message.style.color = "var(--ok)";
+          message.textContent = result.message;
+        } catch (error) {
+          message.style.color = "var(--danger)";
+          message.textContent = error.message;
+        } finally {
+          button.disabled = false;
+        }
+      });
+
+      try {
+        const results = await Promise.all([
+          Sakura.api("/api/me"),
+          Sakura.api("/api/shop/orders"),
+          Sakura.api("/api/site/products")
+        ]);
+
+        renderUser(results[0]);
+        renderOrders(results[1] || []);
+        renderShop(results[2] || []);
+      } catch (error) {
+        if (error.status === 401) {
+          Sakura.store.clear();
+          location.href = "/login.html";
+          return;
+        }
+        console.error(error);
+      }
+    })();
+  </script>
+</body>
+</html>
