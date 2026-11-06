@@ -136,7 +136,8 @@
         document.getElementById("role").textContent = user.role;
         document.getElementById("createdAt").textContent = Sakura.date(user.createdAtUtc);
         document.getElementById("hwidState").textContent = user.hasHwid ? "Привязан" : "Не привязан";
-        document.getElementById("adminLink").hidden = user.role !== "Owner";
+        document.getElementById("adminLink").hidden =
+          !["Owner", "Developer"].includes(user.role);
 
         const active = user.activeSubscription;
         const status = document.getElementById("subStatus");
