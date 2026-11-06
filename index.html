@@ -1,101 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SakuraClient 26.2 — Minecraft-клиент</title>
+  <meta name="description" content="Приватный Minecraft-клиент SakuraClient 26.2: модули, конфиги, плавность и защита аккаунта." />
+  <link rel="icon" type="image/png" href="/assets/logo.png" />
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="/">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <path fill="#ff5c9e" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#ff6fae" transform="rotate(72 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#e33c86" transform="rotate(144 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#ff8fbf" transform="rotate(216 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <path fill="#c86bdd" transform="rotate(288 32 32)" d="M32 5c4 9 4 14 0 21-4-7-4-12 0-21Z" />
+          <circle cx="32" cy="32" r="5" fill="#fff" />
+        </svg>
+        <span>SAKURA</span>
+        <em>26.2</em>
+      </a>
 
-} = require("../lib/auth");
-const {
-  toUserDto,
-  toProductDto,
-  toOrderDto,
-  toKeyDto,
-  toDiscountDto,
-  formatRuDate
-} = require("../lib/dto");
-const { newKey } = require("../lib/keys");
+      <nav class="site-nav">
+        <a href="#features">Возможности</a>
+        <a href="#pricing">Тарифы</a>
+        <a href="#faq">FAQ</a>
+      </nav>
 
-const DAY_MS = 24 * 60 * 60 * 1000;
-const ROLES = new Set(["Player", "User", "Developer", "Owner"]);
-const ROLES = new Set(["Player", "User", "Staff", "Admin", "Developer", "Owner"]);
-const DB_ERROR_CODES = new Set([
-  "ECONNREFUSED",
-  "ENOTFOUND",
-  "ETIMEDOUT",
-  "EHOSTUNREACH",
-  "28P01",
-  "3D000",
-  "57P01"
-]);
+      <div class="header-actions">
+        <a class="btn btn-ghost btn-sm" href="/login.html">Войти</a>
+        <a class="btn btn-sm" href="/register.html">Регистрация</a>
+      </div>
+    </div>
+  </header>
 
-class HttpError extends Error {
-  constructor(status, message) {
-        `UPDATE users
-            SET has_lifetime = TRUE, subscription_ends_utc = NULL, role = 'Owner'
-          WHERE id = $1`,
-        [lockedUser.id]
-      );
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="tagline">✦ Победа — это эстетика</span>
+          <h1>Приватный клиент <span>SakuraClient</span> 26.2</h1>
+          <p>
+            Модули, облачные конфиги и плавная работа в одном клиенте.
+            Купи подписку, активируй ключ в личном кабинете — и запускай игру прямо из лоадера.
+          </p>
+          <div class="hero-actions">
+            <a class="btn" href="/download/SakuraLoader.exe">Скачать лоадер</a>
+            <a class="btn btn-ghost" href="#pricing">Купить</a>
+            <a class="btn btn-ghost" href="/app.html">Личный кабинет</a>
+          </div>
+          <div class="hero-meta">
+            <span><b>26.2</b> Minecraft</span>
+            <span><b>Fabric</b> загрузчик</span>
+            <span><b>24/7</b> сервер лицензий</span>
+          </div>
+        </div>
 
-      message = "Навсегда и права владельца";
-    } else if (product.kind === "hwid") {
-      await client.query("UPDATE users SET hwid_hash = NULL WHERE id = $1", [lockedUser.id]);
-      lockedUser.hwid_hash = null;
-      message = "HWID сброшен — перезайди в аккаунт";
-    } else {
-      const term = key.custom_days == null
-        ? product
-        : { ...product, days: Number(key.custom_days) };
+        <div class="hero-shot">
+          <img src="/assets/app.png" alt="SakuraClient 26.2" />
+        </div>
+      </div>
+    </section>
 
-      applySubscription(lockedUser, product);
-      applySubscription(lockedUser, term);
-      if (lockedUser.role === "Player") lockedUser.role = "User";
+    <section id="features">
+      <div class="container">
+        <div class="section-head">
+          <h2>Что внутри</h2>
+          <p>Всё для комфортной игры — без лишних настроек и тормозов.</p>
+        </div>
 
-      await client.query(
-        `UPDATE users
-            SET has_lifetime = $2, subscription_ends_utc = $3, role = $4
-          WHERE id = $1`,
-        [
-          lockedUser.id,
-          Boolean(lockedUser.has_lifetime),
-          lockedUser.subscription_ends_utc,
-          lockedUser.role
-        ]
-      );
+        <div class="cards">
+          <article class="card">
+            <div class="card-icon">✦</div>
+            <h3>Модули</h3>
+            <p>Боевые, визуальные и вспомогательные модули с гибкими настройками под твой стиль игры.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">◈</div>
+            <h3>Конфиги</h3>
+            <p>Сохраняй и переключай настройки в пару кликов — конфигурация привязана к аккаунту.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">⚡</div>
+            <h3>Производительность</h3>
+            <p>Плавный рендер и оптимизация убирают лишние просадки даже на слабых сборках.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">◎</div>
+            <h3>Кастомизация</h3>
+            <p>ClickGUI можно перекрасить под себя: палитра, темы, прозрачность и анимации.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">◆</div>
+            <h3>Защита аккаунта</h3>
+            <p>Привязка к HWID: аккаунт работает только на твоём устройстве. Сброс — в пару кликов.</p>
+          </article>
+          <article class="card">
+            <div class="card-icon">☘</div>
+            <h3>Поддержка</h3>
+            <p>Помогаем с активацией, обновлениями и запуском — быстро и без лишних вопросов.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-      message = product.days == null
-      message = term.days == null
-        ? "Активирована подписка навсегда"
-        : `Подписка активна до ${formatRuDate(lockedUser.subscription_ends_utc)}`;
-    }
+    <section id="pricing">
+      <div class="container">
+        <div class="section-head">
+          <h2>Тарифы</h2>
+          <p>Одна подписка на все функции. Оплата в FunPay, ключ активируется в кабинете.</p>
+        </div>
 
-    await client.query(
-      `UPDATE license_keys
-          SET redeemed_by_user_id = $2, redeemed_at_utc = NOW()
-        WHERE id = $1`,
-      [key.id, lockedUser.id]
-    );
+        <div class="pricing" id="pricingGrid">
+          <article class="price-card">
+            <h3>30 дней</h3>
+            <div class="price">299 <small>₽</small></div>
+            <ul>
+              <li>Все модули</li>
+              <li>Cloud-конфиги</li>
+              <li>Обновления</li>
+            </ul>
+            <a class="btn" href="https://funpay.com/lots/offer?id=80610998" target="_blank" rel="noopener">Купить</a>
+          </article>
+          <article class="price-card popular">
+            <span class="price-badge">Выбор игроков</span>
+            <h3>Навсегда</h3>
+            <div class="price">499 <small>₽</small></div>
+            <ul>
+              <li>Все модули</li>
+              <li>Cloud-конфиги</li>
+              <li>Все будущие обновления</li>
+            </ul>
+            <a class="btn" href="https://funpay.com/lots/offer?id=80613970" target="_blank" rel="noopener">Купить</a>
+          </article>
+          <article class="price-card">
+            <h3>180 дней</h3>
+            <div class="price">399 <small>₽</small></div>
+            <ul>
+              <li>Все модули</li>
+              <li>Cloud-конфиги</li>
+              <li>Обновления</li>
+            </ul>
+            <a class="btn" href="https://funpay.com/lots/offer?id=80611752" target="_blank" rel="noopener">Купить</a>
+          </article>
+        </div>
+      </div>
+    </section>
 
-    return { user: lockedUser, message };
-  );
-  send(res, 200, rows.map(toKeyDto));
-}
+    <section id="faq">
+      <div class="container">
+        <div class="section-head">
+          <h2>Частые вопросы</h2>
+        </div>
 
-async function adminCreateKeys(req, res) {
-  const admin = await currentAdmin(req);
-  const body = readBody(req);
-  const productId = Number.parseInt(body.productId, 10);
-  const count = Math.min(Math.max(Number.parseInt(body.count, 10) || 1, 1), 50);
-  let note = String(body.note ?? "").trim();
-  if (note.length > 60) note = note.slice(0, 60);
+        <div class="faq">
+          <details>
+            <summary>Как установить клиент?</summary>
+            <p>Скачай лоадер, запусти его и войди в аккаунт. Нажми «Запустить» — лоадер сам скачает Minecraft 26.2, Fabric, Java 25 и файлы клиента.</p>
+          </details>
+          <details>
+            <summary>Какая версия Minecraft поддерживается?</summary>
+            <p>Minecraft 26.2 с загрузчиком Fabric. Лоадер сам собирает нужные аргументы запуска.</p>
+          </details>
+          <details>
+            <summary>Можно играть на нескольких ПК?</summary>
+            <p>Аккаунт привязан к одному HWID. Чтобы перенести его на другое устройство, оформи сброс HWID.</p>
+          </details>
+          <details>
+            <summary>Как активировать ключ?</summary>
+            <p>Войди в личный кабинет на сайте и вставь ключ в блок «Активация ключа». Подписка включится сразу.</p>
+          </details>
+          <details>
+            <summary>Что делать, если клиент не запускается?</summary>
+            <p>Проверь, что есть интернет и активна подписка. Java 25 и остальные файлы лоадер скачивает сам. Если ошибка остаётся — пришли лог из %LOCALAPPDATA%\SakuraClient\logs в поддержку.</p>
+          </details>
+        </div>
+      </div>
+    </section>
 
-  // Свой срок: товар всё равно нужен (внешний ключ в license_keys), но при
-  // активации duration берётся из custom_days ключа, а не из товара.
-  const rawDays = String(body.days ?? "").trim();
-  const customDays = rawDays.length > 0 ? Number.parseInt(rawDays, 10) : null;
-  if (customDays !== null && (!Number.isInteger(customDays) || customDays < 1 || customDays > 3650)) {
-    throw new HttpError(400, "Срок ключа — от 1 до 3650 дней");
-  }
+    <section>
+      <div class="container">
+        <div class="cta">
+          <h2>Готов, когда готов ты</h2>
+          <p>Создай аккаунт, активируй ключ и заходи в игру за минуту.</p>
+          <a class="btn" href="/register.html">Создать аккаунт</a>
+        </div>
+      </div>
+    </section>
+  </main>
 
-  const product = customDays !== null
-    ? (
-        await query(
-          `SELECT * FROM products
-            WHERE kind = 'sub' AND is_active = TRUE
-            ORDER BY days ASC NULLS LAST, id LIMIT 1`
-        )
-      ).rows[0]
+  <footer>
+    <div class="container">
+      <span>© 2026 SakuraClient 26.2</span>
+      <span>Оплата: FunPay · Поддержка: Telegram</span>
+    </div>
+  </footer>
+
+  <script src="/assets/api.js"></script>
+  <script>
+    (async function () {
+      const user = Sakura.store.user();
+      if (user) {
+        document.querySelectorAll('a[href="/login.html"], a[href="/register.html"], a[href="/app.html"]').forEach(function (link) {
+          if (link.textContent.trim() === "Войти") {
+            link.textContent = user.username;
+            link.href = "/app.html";
+          }
+          if (link.textContent.trim() === "Регистрация") {
+            link.textContent = "Кабинет";
+            link.href = "/app.html";
+          }
+        });
+      }
+
+      try {
+        const products = await Sakura.api("/api/site/products");
+        if (!Array.isArray(products) || products.length === 0) return;
+
+        const subscriptions = products
+          .filter(function (p) { return p.kind === "sub"; })
+          .sort(function (a, b) { return (a.days || 9999) - (b.days || 9999); });
+
+        if (subscriptions.length === 0) return;
+
+        const grid = document.getElementById("pricingGrid");
+        grid.innerHTML = subscriptions.map(function (product) {
+          const period = product.days ? product.days + " дней" : "Навсегда";
+          return (
+            '<article class="price-card' + (product.days ? "" : " popular") + '">' +
+            (product.days ? "" : '<span class="price-badge">Выбор игроков</span>') +
+            "<h3>" + period + "</h3>" +
+            '<div class="price">' + Sakura.money(product.price).replace(" ₽", "") + " <small>₽</small></div>" +
+            "<ul><li>Все модули</li><li>Cloud-конфиги</li><li>Обновления</li></ul>" +
+            '<a class="btn" href="' + Sakura.buyLink(product) + '" target="_blank" rel="noopener">Купить</a>' +
+            "</article>"
+          );
+        }).join("");
+      } catch (error) {
+        console.warn("Не удалось загрузить тарифы:", error.message);
+      }
+    })();
+  </script>
+</body>
+</html>
