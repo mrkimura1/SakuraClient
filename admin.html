@@ -77,10 +77,14 @@
           <h2>Ключи доступа</h2>
           <form class="inline-form" id="keyForm">
             <select id="keyProduct" aria-label="Товар"></select>
+            <input id="keyDays" type="number" min="1" max="3650" placeholder="свои дни" aria-label="Срок в днях" />
             <input id="keyCount" type="number" min="1" max="50" value="5" aria-label="Сколько ключей" />
             <input id="keyNote" type="text" maxlength="60" placeholder="пометка" aria-label="Пометка" />
             <button class="btn" type="submit">Создать</button>
           </form>
+          <p class="muted" style="margin: 6px 0 0">
+            «Свои дни» перекрывает товар: ключ даст ровно столько дней, сколько вписано (1–3650).
+          </p>
           <div class="form-message" id="keysMessage"></div>
           <div class="table-scroll">
             <table class="orders">
